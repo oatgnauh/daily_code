@@ -37,7 +37,7 @@ bool _key::operator<(const _key & right) const
     return false;
 }
 
-
+ std::map<_key, std::string> mmp;
 #else
 //方式二：传入一个仿函数作为map示例的第三个模板参数
 
@@ -54,17 +54,15 @@ struct cmp
 
 };
 
+std::map<_key, std::string,cmp> mmp;
 #endif
 
 
 int main()
 {
-    // std::map<_key, std::string> mmp;
-
-    std::map<_key, std::string,cmp> mmp;
 	_key a = _key(1, "hello");
 	_key b = _key(2, "hello1");
-	_key c = _key(1, "ehello");
+	_key c = _key(1, "hello2");
 	mmp[a] = "test";
 	mmp[b] = "world1";
 	mmp[c] = "world2";

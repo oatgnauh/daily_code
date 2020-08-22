@@ -39,9 +39,8 @@ private:
 class SeaKing
 {
 public:
-	SeaKing() {
-		
-	}
+	SeaKing() {}
+    
 	void PickUpArtist(const sp_ptr<GreenTea> &girl)
 	{
 		girl_ocean_.insert(girl);
@@ -60,11 +59,9 @@ private:
 
 int main()
 {
-	
     sp_ptr<SeaKing>  king(new SeaKing);
     sp_ptr<GreenTea> tea(new GreenTea(king));
     king->PickUpArtist(tea);
-
 
     return 0;
 }

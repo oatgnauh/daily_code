@@ -1,0 +1,424 @@
+
+b2 toolset=msvc-9.0 --build-type=complete stage
+
+b2 toolset=msvc-9.0 --build-type=complete stage --without-graph --without-graph_parallel --without-mpi --wihout-python --without-wave
+
+
+// 指定编译类型为多线程静态链接库:link=static variant=debug|release threading=multi
+b2 toolset=msvc-9.0 link=static variant=debug,release threading=multi --with-atomic --with-chrono --with-container --with-context --with-coroutine --with-date_time --with-filesystem --with-math --with-random --with-regex --with-signals --with-system --with-exception --with-test --with-thread --with-timer stage
+
+b2 toolset=msvc-12.0 link=static variant=debug,release threading=multi --with-atomic --with-chrono --with-container --with-context --with-coroutine --with-date_time --with-filesystem --with-math --with-random --with-regex --with-signals --with-system --with-exception --with-test --with-thread --with-timer --stagedir=./stage/vc12 stage
+
+// 指定编译类型为所有类型:--build-type=complete
+b2 toolset=msvc-9.0 --build-type=complete --with-atomic --with-chrono --with-context --with-coroutine --with-date_time --with-filesystem --with-math --with-random --with-regex --with-signals --with-system --with-exception --with-thread --with-timer stage
+
+b2 toolset=msvc-14.1  stage --build-type=complete --without-graph --without-graph_parallel --without-mpi --wihout-python --without-wave --without-log --without-serialization
+
+
+Component configuration:
+
+    - atomic                   : building
+    - chrono                   : building
+    - container                : not building
+    - context                  : building
+    - contract                 : not building
+    - coroutine                : building
+    - date_time                : building
+    - exception                : building
+    - fiber                    : not building
+    - filesystem               : building
+    - graph                    : not building
+    - graph_parallel           : not building
+    - iostreams                : not building
+    - locale                   : not building
+    - log                      : not building
+    - math                     : building
+    - mpi                      : not building
+    - program_options          : not building
+    - python                   : not building
+    - random                   : building
+    - regex                    : building
+    - serialization            : not building
+    - signals                  : building
+    - stacktrace               : not building
+    - system                   : building
+    - test                     : not building
+    - thread                   : building
+    - timer                    : building
+    - type_erasure             : not building
+    - wave                     : not building
+
+Component configuration:
+
+    - atomic                   : building
+    - chrono                   : building
+    - container                : building
+    - context                  : building
+    - coroutine                : building
+    - date_time                : building
+    - exception                : building
+    - filesystem               : building
+    - graph                    : not building
+    - graph_parallel           : building
+    - iostreams                : building
+    - locale                   : building
+    - log                      : building
+    - math                     : building
+    - mpi                      : not building
+    - program_options          : building
+    - python                   : building
+    - random                   : building
+    - regex                    : building
+    - serialization            : building
+    - signals                  : building
+    - system                   : building
+    - test                     : building
+    - thread                   : building
+    - timer                    : building
+    - wave                     : not building
+
+1.使用命令编译boost：
+b2 toolset=msvc-9.0 link=static variant=debug,release threading=multi runtime-link=shared --layout=versioned --with-atomic --with-chrono --with-coroutine --with-context--with-date_time --with-exception --with-program_options --with-regex --with-system --with-test --with-thread --with-timer stage
+
+2.上述命令中， toolset=msvc-11.0可以替换为对应的编译器，比如gcc、msvc-12.0等；
+3.等待编译完成；
+4.完成后，编译好的库，在根目录下的stage/lib下
+
+=============
+bjam.exe --build-type=complete --with-date_time --with-filesystem --with-system --with-thread toolset=msvc-9.0 stage
+
+
+
+bjam.exe --build-type=complete --with-regex toolset=msvc-9.0 stage
+
+bjam.exe --build-type=complete --with-date_time --with-filesystem --with-system --with-thread toolset=msvc-9.0 stage
+
+
+=============
+
+bjam.exe --build-type=complete --with-regex --toolset=msvc-9.0 stage
+
+bjam.exe --build-type=complete --with-iostreams -sZLIB_SOURCE=E:/libs/zlib/zlib-1.2.8 --toolset=msvc-9.0 stage
+
+
+=====================
+编译全部类库:
+b2.exe --toolset=msvc-9.0 --build-type=complete stage
+
+编译指定的类库
+b2.exe --toolset=msvc-9.0 --with-date_time --with-filesystem --with-system --with-thread --build-type=complete stage
+
+b2.exe --build-type=complete --with-iostreams -sZLIB_SOURCE=E:/libs/zlib/zlib-1.2.8 -sBZIP2_SOURCE=E:/libs/zlib/bzip2-1.0.6 --toolset=msvc-9.0 stage
+
+编译除指定外的所有类库
+b2.exe --toolset=msvc-9.0 --without-graph --without-log --without-python --without-wave --build-type=complete stage
+
+
+
+---------------
+In particular, to limit the amount of time spent building, you may be interested in:
+limiting which libraries get built with the --with-library-name or --without-library-name options
+
+The only Boost libraries that must be built separately are:
+
+Boost.Chrono
+Boost.Context
+Boost.Filesystem
+Boost.GraphParallel
+Boost.IOStreams
+Boost.Locale
+Boost.MPI
+Boost.ProgramOptions
+Boost.Python (see the Boost.Python build documentation before building and installing it)
+Boost.Regex
+Boost.Serialization
+Boost.Signals
+Boost.System
+Boost.Thread
+Boost.Timer
+Boost.Wave
+
+
+A few libraries have optional separately-compiled binaries:
+
+Boost.DateTime has a binary component that is only needed if you're using its to_string/from_string or      serialization features, or if you're targeting Visual C++ 6.x or Borland.
+Boost.Graph also has a binary component that is only needed if you intend to parse GraphViz files.
+Boost.Math has binary components for the TR1 and C99 cmath functions.
+Boost.Random has a binary component which is only needed if you're using random_device.
+Boost.Test can be used in “header-only” or “separately compiled” mode, although separate compilation is       recommended for serious use.
+Boost.Exception provides non-intrusive implementation of exception_ptr for 32-bit _MSC_VER==1310 and _MSC_VER==1400       which requires a separately-compiled binary. 
+      This is enabled by #define BOOST_ENABLE_NON_INTRUSIVE_EXCEPTION_PTR.
+
+---------------
+Library Naming
+
+For example, libboost_regex-vc71-mt-d-1_34.lib can be broken down into the following elements:
+
+Key	Use this library when:	Boost.Build option
+s	linking statically to the C++ standard library and compiler runtime support libraries.	runtime-link=static
+g	using debug versions of the standard and runtime support libraries.	runtime-debugging=on
+y	using a special debug build of Python.	python-debugging=on
+d	building a debug version of your code.6	variant=debug
+p	using the STLPort standard library rather than the default one supplied with your compiler.	stdlib=stlport
+
+----------------
+b2.exe link=static,shared threading=single,multi
+
+Feature	Allowed values	Notes
+variant	debug,release	 
+link	shared,static	Determines if Boost.Build creates shared or static libraries
+threading	single,multi	Cause the produced binaries to be thread-safe. This requires proper support in the source code itself.
+address-model	32,64	Explicitly request either 32-bit or 64-bit code generation. This typically requires that your compiler is appropriately configured. Please refer to the section called “C++ Compilers” and your compiler documentation in case of problems.
+toolset	(Depends on configuration)	The C++ compiler to use. See the section called “C++ Compilers” for a detailed list.
+include	(Arbitrary string)	Additional include paths for C and C++ compilers.
+define	(Arbitrary string)	Additional macro definitions for C and C++ compilers. The string should be either SYMBOL or SYMBOL=VALUE
+cxxflags	(Arbitrary string)	Custom options to pass to the C++ compiler.
+cflags	(Arbitrary string)	Custom options to pass to the C compiler.
+linkflags	(Arbitrary string)	Custom options to pass to the C++ linker.
+runtime-link	shared,static	Determines if shared or static version of C and C++ runtimes should be used.
+
+-----------------
+
+set BZIP2_SOURCE="E:/Libs/bzip2-1.0.4" 
+set  ZLIB_SOURCE=" E:/Libs/zlib/zlib-1.2.8"
+
+//used with regex library with unicode support 
+set ICU_PATH="E:/library/icu"
+====================
+
+bjam --toolset=msvc --stagedir=./lib_x86 --builddir=./ address-model=32 link=shared,static runtime-link=shared,static threading=multi stage debug release
+
+x64 平台：b2 --toolset=msvc-10.0 --stagedir=./lib_x64 --build-type=complete architecture=x86 address-model=64 stage
+
+=======================================
+Building the Boost C++ Libraries.
+
+
+Performing configuration checks
+
+    - 32-bit                   : yes
+    - arm                      : no
+    - mips1                    : no
+    - power                    : no
+    - sparc                    : no
+    - x86                      : yes
+    - has_icu builds           : no
+warning: Graph library does not contain MPI-based parallel components.
+note: to enable them, add "using mpi ;" to your user-config.jam
+
+E:\Libs\boost_1_56_0>b2 --help
+Boost.Build 2014.03-svn
+
+Project-specific help:
+
+  Project has jamfile at Jamroot
+
+Usage:
+
+  b2 [options] [properties] [install|stage]
+
+  Builds and installs Boost.
+
+Targets and Related Options:
+
+  install                 Install headers and compiled library files to the
+  =======                 configured locations (below).
+
+  --prefix=<PREFIX>       Install architecture independent files here.
+                          Default; C:\Boost on Win32
+                          Default; /usr/local on Unix. Linux, etc.
+
+  --exec-prefix=<EPREFIX> Install architecture dependent files here.
+                          Default; <PREFIX>
+
+  --libdir=<DIR>          Install library files here.
+                          Default; <EPREFIX>/lib
+
+  --includedir=<HDRDIR>   Install header files here.
+                          Default; <PREFIX>/include
+
+  stage                   Build and install only compiled library files to the
+  =====                   stage directory.
+
+  --stagedir=<STAGEDIR>   Install library files here
+                          Default; ./stage
+
+Other Options:
+
+  --build-type=<type>     Build the specified pre-defined set of variations of
+                          the libraries. Note, that which variants get built
+                          depends on what each library supports.
+
+                              -- minimal -- (default) Builds a minimal set of
+                              variants. On Windows, these are static
+                              multithreaded libraries in debug and release
+                              modes, using shared runtime. On Linux, these are
+                              static and shared multithreaded libraries in
+                              release mode.
+
+                              -- complete -- Build all possible variations.
+
+  --build-dir=DIR         Build in this location instead of building within
+                          the distribution tree. Recommended!
+
+  --show-libraries        Display the list of Boost libraries that require
+                          build and installation steps, and then exit.
+
+  --layout=<layout>       Determine whether to choose library names and header
+                          locations such that multiple versions of Boost or
+                          multiple compilers can be used on the same system.
+
+                              -- versioned -- Names of boost binaries include
+                              the Boost version number, name and version of
+                              the compiler and encoded build properties. Boost
+                              headers are installed in a subdirectory of
+                              <HDRDIR> whose name contains the Boost version
+                              number.
+
+                              -- tagged -- Names of boost binaries include the
+                              encoded build properties such as variant and
+                              threading, but do not including compiler name
+                              and version, or Boost version. This option is
+                              useful if you build several variants of Boost,
+                              using the same compiler.
+
+                              -- system -- Binaries names do not include the
+                              Boost version number or the name and version
+                              number of the compiler. Boost headers are
+                              installed directly into <HDRDIR>. This option is
+                              intended for system integrators building
+                              distribution packages.
+
+                          The default value is 'versioned' on Windows, and
+                          'system' on Unix.
+
+  --buildid=ID            Add the specified ID to the name of built libraries.
+                          The default is to not add anything.
+
+  --python-buildid=ID     Add the specified ID to the name of built libraries
+                          that depend on Python. The default is to not add
+                          anything. This ID is added in addition to --buildid.
+
+  --help                  This message.
+
+  --with-<library>        Build and install the specified <library>. If this
+                          option is used, only libraries specified using this
+                          option will be built.
+
+  --without-<library>     Do not build, stage, or install the specified
+                          <library>. By default, all libraries are built.
+
+Properties:
+
+  toolset=toolset         Indicate the toolset to build with.
+
+  variant=debug|release   Select the build variant
+
+  link=static|shared      Whether to build static or shared libraries
+
+  threading=single|multi  Whether to build single or multithreaded binaries
+
+  runtime-link=static|shared
+                          Whether to link to static or shared C and C++
+                          runtime.
+
+
+General command line usage:
+
+    b2 [options] [properties] [targets]
+
+  Options, properties and targets can be specified in any order.
+
+Important Options:
+
+  * --clean Remove targets instead of building
+  * -a Rebuild everything
+  * -n Don't execute the commands, only print them
+  * -d+2 Show commands as they are executed
+  * -d0 Supress all informational messages
+  * -q Stop at first error
+  * --reconfigure Rerun all configuration checks
+  * --debug-configuration Diagnose configuration
+  * --debug-building Report which targets are built with what properties
+  * --debug-generator Diagnose generator search/execution
+
+Further Help:
+
+  The following options can be used to obtain additional documentation.
+
+  * --help-options Print more obscure command line options.
+  * --help-internal Boost.Build implementation details.
+  * --help-doc-options Implementation details doc formatting.
+
+...found 1 target...
+
+====================================
+E:\Libs\boost_1_56_0>b2 toolset=msvc-12.0 --build-type=complete --with-atomic --
+with-chrono --with-context --with-coroutine --with-date_time --with-filesystem -
+-with-math --with-random --with-regex --with-signals --with-system --with-except
+ion --with-thread --with-timer --stagedir=./stage/vc12 stage
+Performing configuration checks
+
+    - 32-bit                   : yes
+    - arm                      : no
+    - mips1                    : no
+    - power                    : no
+    - sparc                    : no
+    - x86                      : yes
+    - gcc visibility           : no
+    - long double support      : yes
+    - has_icu builds           : no
+
+Component configuration:
+
+    - atomic                   : building
+    - chrono                   : building
+    - container                : not building
+    - context                  : building
+    - coroutine                : building
+    - date_time                : building
+    - exception                : building
+    - filesystem               : building
+    - graph                    : not building
+    - graph_parallel           : not building
+    - iostreams                : not building
+    - locale                   : not building
+    - log                      : not building
+    - math                     : building
+    - mpi                      : not building
+    - program_options          : not building
+    - python                   : not building
+    - random                   : building
+    - regex                    : building
+    - serialization            : not building
+    - signals                  : building
+    - system                   : building
+    - test                     : not building
+    - thread                   : building
+    - timer                    : building
+    - wave                     : not building
+
+...patience...
+...patience...
+...found 5253 targets...
+...updating 2044 targets...
+common.mkdir stage\vc12
+common.mkdir stage\vc12\lib
+common.mkdir bin.v2\libs\atomic\build\msvc-12.0
+common.mkdir bin.v2\libs\atomic\build\msvc-12.0\debug
+common.mkdir bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi
+compile-c-c++ bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi\lockpool.
+obj
+lockpool.cpp
+msvc.link.dll bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi\boost_ato
+mic-vc120-mt-gd-1_56.dll
+   正在创建库 bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi\boost_ato
+mic-vc120-mt-gd-1_56.lib 和对象 bin.v2\libs\atomic\build\msvc-12.0\debug\threadi
+ng-multi\boost_atomic-vc120-mt-gd-1_56.exp
+msvc.manifest.dll bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi\boost
+_atomic-vc120-mt-gd-1_56.dll
+common.copy stage\vc12\lib\boost_atomic-vc120-mt-gd-1_56.dll
+bin.v2\libs\atomic\build\msvc-12.0\debug\threading-multi\boost_atomic-vc120-mt-g
+d-1_56.dll
+已复制         1 个文件。
+

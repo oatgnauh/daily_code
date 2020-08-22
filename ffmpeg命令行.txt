@@ -1,0 +1,153 @@
+常用参数说明：
+
+主要参数： 
+-i 设定输入流 -f 设定输出格式 -ss 开始时间 
+
+视频参数： 
+-vcodec 设定视频编解码器，未设定时则使用与输入流相同的编解码器 
+-b 设定视频流量，默认为200Kbit/s, -r 设定帧率，默认为25, -s 设定画面的宽与高, -aspect 设定画面的比例, -bf B帧数目控制，-g 关键帧间隔控制, -vn 不处理视频, 
+-profile:v main 编码等级为main  -profile:v main -level 3.1
+-bf 0 表示编码不生成B帧。
+-b:v 500k
+
+音频参数： 
+-ar 设定采样率 -ac 设定声音的Channel数 -acodec 设定声音编解码器，未设定时则使用与输入流相同的编解码器 -an 不处理音频
+
+G711a
+-acodec pcm_alaw
+==========================================
+
+视频封装
+ffmpeg –i video_file –i audio_file –vcodec copy –acodec copy output_file
+
+如
+ffmpeg –i test.avi –vcodec copy –acodec copy  test.mp4            //avi转为mp4文件
+
+视频重编码：(帧率25，I帧间隔25，B帧数量0，分辨率D1:704*576)
+ffmpeg.exe -i 20181203164851160.avi -c:v libx264 -r 25 -g 25 -bf 0 -s 704*576 -acodec copy -y out.avi
+
+启用硬解+硬编进行视频重编码：
+ffmpeg.exe -hwaccel cuvid -c:v h264_cuvid -i 20181203164851160.avi -c:v h264_nvenc -g 25 -bf 0 -acodec copy -y out1.avi
+
+音频重编码为AAC：
+ffmpeg.exe -hwaccel cuvid -c:v h264_cuvid -i 20181203164851160.avi -c:v h264_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -y out1.avi
+
+ffmpeg.exe -i 20181203164851160.avi -c:v libx264 -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -y out.avi
+
+==========================================
+加上秒表时间戳水印：
+
+ffmpeg -i "testmp4.mp4" -vf "drawtext=fontfile=arial.ttf: text='time-': timecode='09\:57\:00\:00': r=25: \x=50: y=50:fontsize=40:fontcolor=white: box=1: boxcolor=0x00000000@1" -vcodec h264 -strict -2 -y "output-video.mp4"
+
+加上当前系统时间戳水印：
+ffmpeg -i "testmp4.mp4" -vf "drawtext=fontfile=arial.ttf: text='%{localtime}' : r=25: \x=50: y=50:fontsize=40:fontcolor=white: box=1: boxcolor=0x00000000@1" -vcodec h264 -strict -2 -y "output-video.mp4"
+
+
+ffmpeg -re -i "E:/media/pspgo_final.mp4" -vf "drawtext=fontfile=arial.ttf: text='time-': timecode='08
+\:00\:00\:00': r=25: \x=50:: y=50:fontsize=40:fontcolor=white: box=1: boxcolor=0x00000000@1" -c:v libx264 -c:a aac -ar 44100
+-ac 2 -strict -2 -y "192.168.27.3-0-0.avi"
+
+==========================================
+
+把mp3转成aac，调用以下命令参数：
+
+ffmpeg -i shoutout.mp3 -acodec aac -strict experimental -ab 128k -ar 44.1k -ac 2 -y shoutout.aac
+
+参数定义：
+ab ：码率
+ar ：采样率
+ac ：声道
+
+==========================================
+H264的AVI文件+AAC文件，一起转码成H264+AAC的AVI文件，并加上时间戳水印：
+
+ffmpeg -i "b1.avi" -i "shoutout.aac" -vf "drawtext=fontfile=arial.ttf: text='time-': timecode='09\:00\:00\:00': r=25: \x=50: y=50:fontsize=40:fontcolor=white: box=1: boxcolor=0x00000000@1" -vcodec h264 -strict -2 -acodec copy -y "192.168.27.2-0-0.avi"
+
+
+ffmpeg –i test.mp4 –vcodec h264 –s 352*278 –an –f m4v test.264                 //转码为码流原始文件
+ffmpeg –i test.mp4 –vcodec h264 –bf 0 –g 25 –s 352*278 –an –f m4v test.264   //转码为码流原始文件
+ffmpeg –i test.avi -vcodec mpeg4 –vtag xvid –qsame test_xvid.avi                 //转码为封装文件
+//-bf B帧数目控制，-g 关键帧间隔控制，-s 分辨率控制 
+==========================================
+
+RTSP推流：
+
+默认RTP/UDP方式：
+ffmpeg -re -i "E:/media/192.168.27.3-0-0.avi" -codec copy -f rtsp rtsp://127.0.0.1/192.168.27.3-0-0
+
+
+(TCP方式)
+ffmpeg -re -i "E:/media/192.168.27.3-0-0.avi" -codec copy -f rtsp -rtsp_transport tcp rtsp://127.0.0.1/192.168.27.3-0-0
+
+文件码流重新编码(H264+AAC)推流：
+ffmpeg -re -stream_loop -1 -i E:/media/192.168.27.3-0-0.avi -c:v libx264 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/192.168.27.3-0-0
+ffmpeg -re -stream_loop -1 -i e:/media/192.168.27.2-0-0.avi -c:v libx264 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/192.168.27.2-0-0
+
+ffmpeg -re -i E:/media/pspgo_final.mp4 -c:v libx264 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/stream0
+
+其中参数-bf 0 表示编码不生成B帧。
+-re表示重新调整时间戳，这样就能够将各种文件、RTSP源、RTMP源的不均匀时间戳全部进行ffmpeg的重新调整，再进行rtmp推流，保证直播的平滑和hls切片的均匀。
+
+循环推流：
+ffmpeg -re -stream_loop 5 -i "E:/media/192.168.27.3-0-0.avi" -codec copy -f rtsp rtsp://127.0.0.1/192.168.27.3-0-0
+ffmpeg -re -stream_loop -1 -i "192.168.27.2-0-0.avi" -codec copy -f rtsp rtsp://127.0.0.1/192.168.27.2-0-0
+ffmpeg -re -stream_loop -1 -i "192.168.27.3-0-0.avi" -codec copy -f rtsp rtsp://127.0.0.1/192.168.27.3-0-0
+
+参数-stream_loop 跟循环次数
+-stream_loop 5
+
+RTMP:
+ffmpeg -re -stream_loop -1  -i e:/media/192.168.27.3-0-0.avi -c:v libx264 -bf 0 -c:a aac -ar 44100 -ac 2 -f flv rtmp://127.0.0.1/live/192.168.27.3-0-0
+
+==========================================
+GPU加速命令格式：
+https://www.jianshu.com/p/59da3d350488
+https://github.com/illuspas/ffmpeg-hw-win32
+
+将h264编码的源视频转码为指定尺寸和码率的h264编码视频：
+ffmpeg -hwaccel cuvid -c:v h264_cuvid -i <input> -c:v h264_nvenc -b:v 2048k -vf scale_npp=1280:-1 -y <output>
+或
+ffmpeg -hwaccel nvdec -i <input> -c:v h264_nvenc -b:v 2048k -vf scale_npp=1280:-1 -y <output>
+
+h264_cuvid为N卡的GPU解码器
+h264_nvenc为N卡的GPU编码器
+
+ffmpeg -re -hwaccel cuvid -c:v h264_cuvid -i e:/media/192.168.27.2-0-0.avi -c:v h264_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/192.168.27.2-0-0
+
+ffmpeg -hwaccel cuvid -c:v hevc_cuvid -i d:/test/h265/4k.h265 -c:v hevc_nvenc -g 25 -bf 0 -y E:/media/webplayer/h265player/video/h265.mp4
+
+ffmpeg -hwaccel cuvid -c:v h264_cuvid -i e:/media/192.168.27.2-0-0.avi -c:v hevc_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -y E:/media/webplayer/h265player/video/h265_aac.ts
+
+ffmpeg -hwaccel cuvid -c:v h264_cuvid -i e:/media/192.168.27.2-0-0.avi -c:v h264_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -f flv e:/media/192.168.27.2-0-0.flv
+
+
+循环推流
+ffmpeg -re -stream_loop -1 -hwaccel nvdec -i e:/media/192.168.27.2-0-0.avi -c:v h264_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/h264_1080p
+
+ffmpeg -re -stream_loop -1 -hwaccel nvdec -i e:/media/192.168.27.2-0-0.avi -c:v hevc_nvenc -g 25 -bf 0 -c:a aac -ar 44100 -ac 2 -rtsp_transport tcp -f rtsp rtsp://127.0.0.1/h265_1080p
+
+http://192.168.27.35:1980/h264_1080p.ts
+
+
+==========================================
+
+正常情况下ffmpeg生成moov是在mdat写完成之后写入，可以通过参数faststart将moov容器移动至mdat前面
+ffmpeg –i input.flv –c copy –f mp4 –movflags faststart output.mp4
+
+然后使用mp4info查看mp4的容器顺序，可以看到moov被移动到了mdat前面。
+
+==========================================
+
+将 YUV 和 PCM 文件经过编码后输出成为 MPEG PS 文件：
+(注：此封装缺少PSM：00 00 01 BC)
+ffmpeg -pix_fmt yuv420p -s 720x576 -r 25 -b 8000000 -i test.yuv -f s16le -ac 2 -ar 48000 -ab 384000 -i test.pcm -f vob test.vob
+
+ffmpeg -i input1.avi -sameq inputfile_01.mpg
+
+==========================================
+
+多路视频合并成一路视频
+
+ffmpeg -i "D:\test\1.h264" -i "D:\test\2.h264" -i "D:\test\3.avi" -i "D:\test\4.h264" -filter_complex "nullsrc=size=1920x1080 [base];[0:v] setpts=PTS-STARTPTS, scale=320x240 [upperleft]; [1:v] setpts=PTS-STARTPTS, scale=320x240 [upperright];		[2:v] setpts=PTS-STATPTS, scale=320x240 [lowerleft];[3:v] setpts=PTS-STARTPTS, scale=320x240 [lowerright];[base][upperleft] overlay=shortest=1 [tmp1];[tmp1][upperright] overlay=shortest=1:x=320 [tmp2];[tmp2][lowerleft] overlay=shortest=1:y=240 [tmp3];[tmp3][lowerright] overlay=shortest=1:x=320:y=240" -c:v libx264 output.mp4
+
+ffmpeg -i "D:\test\net_ss_src_1080P.h264" -i "D:\test\hik\952_#_Hik_4864_ps_172.16.3.173.dat-4864-2-AfterAnalaze.h264" -i "D:\test\avi\out2.avi" -i "D:\test\hik\506_#_505000001_1_101(GXX_Monitor_.gmf_src.h264" -filter_complex "nullsrc=size=640x480 [base];[0:v] scale=320x240 [upperleft]; [1:v] scale=320x240 [upperright];[2:v] scale=320x240 [lowerleft];[3:v] scale=320x240 [lowerright];[base][upperleft] overlay=shortest=1 [tmp1];[tmp1][upperright] overlay=shortest=1:x=320 [tmp2];[tmp2][lowerleft] overlay=shortest=1:y=240 [tmp3];[tmp3][lowerright] overlay=shortest=1:x=320:y=240" -c:v libx264 output.mkv
